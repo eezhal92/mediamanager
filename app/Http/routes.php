@@ -15,6 +15,21 @@ Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
 
+Route::get('admissions', [
+	'as'   => 'admissions.index',
+	'uses' => 'AdmissionsController@index'
+]);
+
+Route::get('admissions/apply', [
+	'as'   => 'admissions.create',
+	'uses' => 'AdmissionsController@create'
+]);
+
+Route::post('admissions', [
+	'as'   => 'admissions.store',
+	'uses' => 'AdmissionsController@store'
+]);
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
