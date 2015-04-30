@@ -30,6 +30,17 @@ Route::post('admissions', [
 	'uses' => 'AdmissionsController@store'
 ]);
 
+Route::get('admissions/applicants', [
+	'as'   => 'admissions.show',
+	'uses' => 'AdmissionsController@applicantLists'
+]);
+
+Route::resource('medias', 'MediasController');
+
+Route::get('media-explorer', function() {
+	return View::make('media-explorer');
+});
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
