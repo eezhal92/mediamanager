@@ -90,4 +90,11 @@ class AdmissionsController extends Controller {
 		//
 	}
 
+	public function applicantLists()
+	{
+		$applicants = \App\Person::orderBy('created_at', 'desc')->paginate(20);
+
+		return view('admissions.lists', compact('applicants'));
+	}
+
 }
