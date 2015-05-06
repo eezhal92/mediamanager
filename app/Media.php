@@ -9,7 +9,7 @@ class Media extends Model {
 
 	public $timestamps = true;
 
-    public $appends = ['extension', 'formatted_size', 'file_path'];
+    // public $appends = ['extension', 'formatted_size', 'file_path'];
 
     // variable for extension
 

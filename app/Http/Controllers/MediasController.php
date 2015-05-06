@@ -2,6 +2,8 @@
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Media;
+use App\Http\Requests\StoreMediaRequest;
 
 use Illuminate\Http\Request;
 
@@ -12,9 +14,46 @@ class MediasController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		//
+		if($request->ajax()) 
+		{
+			$page 		= e($request->get('page','1'));
+            $perPage 	= e($request->get('per_page','5'));
+            $offset 	= $page * $perPage - $perPage;
+            $filter 	= e($request->get('filter', 'all'));
+            $sort 		= e($request->get('sort'));
+
+
+            switch ($filter) {
+              case 'files':
+              case 'images':
+              default:
+                $media = Media::orderBy('created_at');
+                break;
+            }
+
+            switch ($sort) {
+                case 'date_desc':
+                    $media->orderBy('created_at', 'desc');
+                    break;
+                case 'name_asc':
+                    $media->orderBy('nama_file', 'asc');
+                    break;
+                case 'name_desc':
+                    $media->orderBy('nama_file', 'desc');
+                    break;
+                default:
+                    $media->orderBy('created_at', 'asc');
+                    break;
+            }
+
+            return $media->take($perPage)->offset($offset)->paginate($perPage);
+		}
+
+		$medias = Media::orderBy('created_at', 'desc')->paginate(20);
+
+		return view('medias.index', compact('medias'));
 	}
 
 	/**
@@ -24,7 +63,7 @@ class MediasController extends Controller {
 	 */
 	public function create()
 	{
-		//
+		return view('medias.create');
 	}
 
 	/**
@@ -32,9 +71,9 @@ class MediasController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store(StoreMediaRequest $request)
 	{
-		//
+		event(new \App\Events\MediaIsGoingToBeStored());
 	}
 
 	/**

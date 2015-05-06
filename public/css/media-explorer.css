@@ -1,0 +1,90 @@
+.media-item {
+    padding: 10px;
+}
+
+.media-item .thumb {
+    height: 147px;
+}
+
+.media-item .thumb img {
+    margin: 0 auto;
+}
+
+.media-item .pdf {
+    background: url('../img/mediaicons/pdf19.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .docx {
+    background: url('../img/mediaicons/docx.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .pptx {
+    background: url('../img/mediaicons/pptx2.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .xlsx {
+    background: url('../img/mediaicons/xlsx.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .ppt {
+    background: url('../img/mediaicons/ppt.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .doc {
+    background: url('../img/mediaicons/doc2.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .xls {
+    background: url('../img/mediaicons/xls1.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .rar {
+    background: url('../img/mediaicons/rar2.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .zip {
+    background: url('../img/mediaicons/zip6.png') no-repeat center;
+    background-size: 120px 120px;
+}
+
+.media-item .filename {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  max-height: 100%;
+  word-wrap: break-word;
+  color: #428bca;
+  text-align: center;
+  font-weight: 700;
+  background: rgba(255,255,255,.8);
+}
+
+.featured-image-container {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.featured-image-container .img-featured {
+  padding: 5px;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+.mexplorer-item-container .loading {
+    text-align: center;
+    margin: 65px;
+}
+
+.mexplorer-item-container .selected {
+    background: #428bca;
+}

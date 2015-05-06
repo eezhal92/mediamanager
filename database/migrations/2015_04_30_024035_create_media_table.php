@@ -12,7 +12,7 @@ class CreateMediaTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('media', function(Blueprint $table)
+		Schema::create('medias', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->string('filename');
@@ -30,7 +30,7 @@ class CreateMediaTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('media');
+		Schema::drop('medias');
 	}
 
 }
