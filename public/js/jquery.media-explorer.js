@@ -171,11 +171,18 @@
 	                    throw new Error('Please specify data-job either "set_value" or "insert_content"')
 	                break;
 	            }
+                
+                $('a[href="#tabExplorer"]').trigger('shown.bs.tab');
 	            console.log('hit modal listener');
 	        });
+            
+            $(base.el).on('hide.bs.modal', function() {
+                base.resetForm();
+                
+            });
 
-	        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-	        	var tab = $(this);
+	        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {	        	
+                var tab = $(this);
 	        	var href = tab.attr('href');
 
 	        	var btn = $('.modal-footer button').attr('id', href.substring(1) + 'Button'); // remove #
@@ -184,17 +191,14 @@
 
 	        	if(tab.attr('href') == '#tabExplorer') {
 	        		btn.text('Masukkan');
+                    console.log('tab explorer shown. get media items...');
 	        	} else {
 	        		btn.text('Upload');
 	        	}
+                
 	        });
 	       
 		}
-
-
-		base.uploadFiles = function() {
-
-		};
 
 		base.setModalFormListener = function () {
 			var file, name, size, type;
@@ -207,14 +211,7 @@
 			});
 
 			$('.modal-footer').on('click', '#tabUploaderButton', function() {
-				alert('upload!');
 				var formData = new FormData($('#mediaUploadForm')[0]);
-
-				function progressHandlingFunction(e){
-				    if(e.lengthComputable){
-				        $('progressBar').width(e.loaded/e.total + '%');
-				    }
-				}
 
 				if( !$.isEmptyObject(base.options.storeToken) ) {
 					var headers = {};
@@ -224,9 +221,6 @@
 					   headers: headers
 					});
 				}
-
-				console.log(base.options.storeToken);
-				console.log(formData);
 
 				$.ajax({
 			        url: base.options.storeUrl , 
@@ -239,23 +233,37 @@
 			            }
 			            return myXhr;
 			        },
-			        beforeSend: function() {},
-			        success: function(res) { console.log(res); },
-			        error: function() {
-			        	var errors = $.parseJSON(data.responseText);
-
-					    console.log(errors);
-
-					    $.each(errors, function(index, value) {
-					        alert(value);
-					    });
-			        },
 			        data: formData,
 			        //Options to tell jQuery not to process data or worry about content-type.
 			        cache: false,
 			        contentType: false,
 			        processData: false
-			    });
+			    }).then(
+                    function(res){ // success block                        
+                        bootalert(res.success);
+                        $('ul.nav-tabs a[href="#tabExplorer"]').tab('show');
+                    }, function(xhr, error) { // error block
+                        var errors = $.parseJSON(xhr.responseText);
+                        console.log('error block');
+                        bootalert(error);
+                    }
+                );
+                
+                function bootalert(message) {
+                    bootbox.alert({
+                        message: message, 
+                        callback: function() {
+                             $('#progressBar').width('0%');
+                        }
+                    });
+                }
+                
+                function progressHandlingFunction(e){
+				    if(e.lengthComputable){
+				        $('#progressBar').width(Math.ceil(e.loaded/e.total) * 100 + '%');
+				    }
+				}
+
 			});
 		}
 
@@ -268,6 +276,16 @@
 		base.getMediaItems = function(request_params) {
 			return $.get(base.indexUrl, request_params);
 		}
+        
+        base.resetForm = function() {
+            return $('#mediaUploadForm').each(function() {                
+                // guard against an input with the name of 'reset'
+                // note that IE reports the reset function as an 'object'
+                if (typeof this.reset == 'function' || (typeof this.reset == 'object' && !this.reset.nodeType)) {
+                    this.reset();
+                }
+            });
+        };
 
 		base.init();
 	};

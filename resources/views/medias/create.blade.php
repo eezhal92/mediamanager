@@ -17,7 +17,7 @@
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
 				<div class="form-group @if($errors->first('media_file')) has-error @endif">
 					<label for="media_file">Media file</label>
-					<input type="file" name="media_file">
+					<input type="file" name="file_input">
 					<span class="help-block">Allowed extension: .doc, .docx, .xls, .xlsx, .ppt, .pptx, .pdf, .rar, .zip, .jpg, .png</span>
 					@if($errors->first('media_file'))
 					<span class="help-block">{{ $errors->first('media_file') }}</span>					

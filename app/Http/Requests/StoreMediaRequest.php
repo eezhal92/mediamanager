@@ -22,7 +22,7 @@ class StoreMediaRequest extends Request {
 	public function rules()
 	{
 		return [
-			'media_file' => 'required'
+			'file_input' => 'required'
 		];
 	}
 

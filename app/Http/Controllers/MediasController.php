@@ -73,7 +73,21 @@ class MediasController extends Controller {
 	 */
 	public function store(StoreMediaRequest $request)
 	{
-		event(new \App\Events\MediaIsGoingToBeStored());
+//		event(new \App\Events\MediaIsGoingToBeStored());
+        if( $request->hasFile('file_input') && $request->file('file_input')->isValid() ) 
+        {            
+            $file = $request->file('file_input');
+            $filename = $file->getClientOriginalName();
+            
+            if($file->getMimeType() == 'application/pdf') {
+//                throw new \Exception('not supported file type');
+                return response()->json(['error' => 'file tidak support'], 400);
+            }
+            
+            $file->move('uploads', $filename);
+            
+            return response()->json(['success' => 'file berhasil di upload']);
+        }
 	}
 
 	/**
