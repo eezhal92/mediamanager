@@ -16,39 +16,39 @@ class MediasController extends Controller {
 	 */
 	public function index(Request $request)
 	{
-		if($request->ajax()) 
+		if($request->ajax())
 		{
 			$page 		= e($request->get('page','1'));
-            $perPage 	= e($request->get('per_page','5'));
-            $offset 	= $page * $perPage - $perPage;
-            $filter 	= e($request->get('filter', 'all'));
-            $sort 		= e($request->get('sort'));
+        $perPage 	= e($request->get('per_page','10'));
+        $offset 	= $page * $perPage - $perPage;
+        $filter 	= e($request->get('filter', 'all'));
+        $sort 		= e($request->get('sort'));
 
 
-            switch ($filter) {
-              case 'files':
-              case 'images':
-              default:
-                $media = Media::orderBy('created_at');
+        switch ($filter) {
+          case 'files':
+          case 'images':
+          default:
+            $media = Media::orderBy('created_at');
+            break;
+        }
+
+        switch ($sort) {
+            case 'date_desc':
+                $media->orderBy('created_at', 'desc');
                 break;
-            }
+            case 'name_asc':
+                $media->orderBy('nama_file', 'asc');
+                break;
+            case 'name_desc':
+                $media->orderBy('nama_file', 'desc');
+                break;
+            default:
+                $media->orderBy('created_at', 'asc');
+                break;
+        }
 
-            switch ($sort) {
-                case 'date_desc':
-                    $media->orderBy('created_at', 'desc');
-                    break;
-                case 'name_asc':
-                    $media->orderBy('nama_file', 'asc');
-                    break;
-                case 'name_desc':
-                    $media->orderBy('nama_file', 'desc');
-                    break;
-                default:
-                    $media->orderBy('created_at', 'asc');
-                    break;
-            }
-
-            return $media->take($perPage)->offset($offset)->paginate($perPage);
+        return $media->take($perPage)->offset($offset)->paginate($perPage);
 		}
 
 		$medias = Media::orderBy('created_at', 'desc')->paginate(20);
@@ -74,18 +74,18 @@ class MediasController extends Controller {
 	public function store(StoreMediaRequest $request)
 	{
 //		event(new \App\Events\MediaIsGoingToBeStored());
-        if( $request->hasFile('file_input') && $request->file('file_input')->isValid() ) 
-        {            
+        if( $request->hasFile('file_input') && $request->file('file_input')->isValid() )
+        {
             $file = $request->file('file_input');
             $filename = $file->getClientOriginalName();
-            
-            if($file->getMimeType() == 'application/pdf') {
-//                throw new \Exception('not supported file type');
-                return response()->json(['error' => 'file tidak support'], 400);
-            }
-            
+
+//             if($file->getMimeType() == 'application/pdf') {
+// //                throw new \Exception('not supported file type');
+//                 return response()->json(['error' => 'file tidak support'], 400);
+//             }
+
             $file->move('uploads', $filename);
-            
+
             return response()->json(['success' => 'file berhasil di upload']);
         }
 	}

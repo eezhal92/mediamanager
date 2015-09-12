@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-	
+
 	<div class="row">
 		<div class="col-md-12">
 			<h1 class="page-header">Media <a href="{{ route('medias.create') }}" class="btn btn-primary pull-right"><i class="glyphicon glyphicon-plus"></i> Create New</a></h1>
@@ -11,8 +11,8 @@
 	</div>
 
 	<div class="row">
-		<div class="col-md-10 col-md-offset-1">
-			
+		<div class="col-md-7">
+			<h3>Data</h3>
 			<table class="table table-striped">
 				<thead>
 					<tr>
@@ -25,7 +25,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach($medias as $m)		
+					@foreach($medias as $m)
 					<tr>
 						<td>{{ $m->filename }}</td>
 						<td>{{ $m->mime_type }}</td>
@@ -37,20 +37,16 @@
 							<a href="#" class="btn btn-danger btn-xs" data-item="{{ $m->filename }}" data-url="{{ route('medias.destroy', $m->id) }}">Delete</a>
 						</td>
 					</tr>
-					@endforeach					
+					@endforeach
 				</tbody>
 			</table>
-
 		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-md-5 col-md-offset-1">
+		<div class="col-md-3">
+			<h3>Explorer</h3>
 			<a href="#" id="btnInsert" data-toggle="modal" data-target="#explorer" data-job="insert_content" class="btn btn-info">Insert a content</a>
 			<a href="#" id="btnSet" data-toggle="modal" data-target="#explorer" data-job="set_value" class="btn btn-success">Set a value</a>
-		</div>
-		<div id=""output class="col-md-5">
-			<div class=".insert-container">
+			<hr>
+			<div class="insert-container">
 				<span>Please insert content here...</span>
 			</div>
 			<hr>
@@ -60,34 +56,16 @@
 				</form>
 			</div>
 		</div>
+		<div id=""output class="col-md-2">
+			<h3>Uploader</h3>
+			<a href="#" id="btnSet" data-toggle="modal" data-target="#explorer" data-show-tab="#tabUploader" data-job="set_value" class="btn btn-warning">Upload</a>
+		</div>
 	</div>
 
 	<div id="explorer"></div>
 
 	<div class="row">
-		<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-  Launch demo modal
-</button>
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
 	</div>
 
 </div>
@@ -98,16 +76,24 @@
 	<script src="{{ asset('js/bootbox.min.js') }}"></script>
 	<script src="{{ asset('js/jquery.bootpag.min.js') }}"></script>
 	<script src="{{ asset('js/jquery.media-explorer.js') }}"></script>
-		
+
 	<script>
 	$(document).ready(function() {
-		
-		$('#explorer').mediaExplorer('foo', {
+
+		$('#explorer').mediaManager('foo', {
 			indexUrl: '/medias',
 			storeUrl: '/medias',
 			storeToken: {
 				name: 'X-CSRF-TOKEN',
 				value: $('meta[name="csrf-token"]').attr('content')
+			},
+			callback: {
+				insertContent: function(sesuatu) {
+					alert(sesuatu);
+				},
+				setValue: function() {
+
+				}
 			}
 		});
 
