@@ -83,8 +83,20 @@ class MediasController extends Controller {
 // //                throw new \Exception('not supported file type');
 //                 return response()->json(['error' => 'file tidak support'], 400);
 //             }
-
             $file->move('uploads', $filename);
+
+						$filename = $file->getClientOriginalName();
+						$mime_type = $file->getClientOriginalExtension();
+						$folder = 'uploads/' ;
+						$path = $folder . $filename;
+						$file_size = $file->getClientSize();
+
+						$media = Media::create([
+	              'filename' => $filename,
+	              'mime_type' => $mime_type,
+	              'path' => $path,
+	              'size' => $file_size,
+	          ]);
 
             return response()->json(['success' => 'file berhasil di upload']);
         }

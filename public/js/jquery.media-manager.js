@@ -138,10 +138,19 @@
             var container = $('#mediaManagerBody .col-md-9 #mediaManagerItemContainer');
             container.empty();
             var vals = '';
+
+            console.log('generate data...');
+            console.log(data);
             
             $(data).each(function(key, val) {     
+                var url = val.url;
+                if(val.mime.split('/')[0] == 'image'){
+                    url = val.file.lg;
+                }
+
+
                 vals += '<div class="col-sm-3 col-xs-6 media-item"> \
-                    <a class="link" data-id="'+ val.id +'" data-url="'+ val.url +'" data-date="'+ val.created_at +'" data-nama-file ="'+ val.nama_file +'" data-mime-type="'+ val.mime +'" data-size ="'+ val.size_format +'">';
+                    <a class="link" data-id="'+ val.id +'" data-url="'+ url +'" data-date="'+ val.created_at +'" data-nama-file ="'+ val.nama_file +'" data-mime-type="'+ val.mime +'" data-size ="'+ val.size_format +'">';
                 if(val.mime.split('/')[0] != 'image'){
                     vals += '<div class="thumb '+ val.ekstensi +'"><div class="filename">'+ val.nama_file +'</div></div>';
                 } else {
@@ -155,7 +164,7 @@
         }
         
         var generateImageTag = function(data) {
-            return '<img width="220" class="img img-rounded img-responsive img-featured" src="'+ data.url +'" alt="'+ data.nama_file +'">';
+            return '<img width="400" class="img img-rounded img-responsive img-featured" src="'+ data.url +'" alt="'+ data.nama_file +'">';
         };
 
         $("#mediaManagerPanel").on('submit', function(event)
@@ -249,15 +258,18 @@
 
         var request_params = settings.request_params;
 
-        console.log('1...');
-        console.log(request_params);
-        console.log('2....');
-        console.log(settings.request_params);
+        // console.log('1...');
+        // console.log(request_params);
+        // console.log('2....');
+        // console.log(settings.request_params);
         
         var request = getIndex(request_params);
         
         request.done(function(res){
             data = res.data;
+
+            console.log('retrieving data...');
+            console.log(data);
             
             $('#mediaManagerPagination').bootpag({
                 total: res.last_page
@@ -286,7 +298,7 @@
             'callback': null
         }, options);
         
-        var html = $('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title" id="mediaModalLabel">Insert Media</h4></div><div class="modal-body"><div class="row"><form id="mediaUploadForm" action="'+ settings.storeUrl +'" method="post" enctype="multipart/form-data"><div class="col-md-6"><input id="fileInput" name="file_input" type="file" required=""><p class="help-block">Choose files.</p></div><div class="col-md-6"><input type="submit" class="btn btn-md btn-primary pull-right" value="Upload"></div></form></div><div id="progressBox" class="progress"><div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0;"></div></div></div></div></div>');
+        var html = $('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">Ã—</button><h4 class="modal-title" id="mediaModalLabel">Insert Media</h4></div><div class="modal-body"><div class="row"><form id="mediaUploadForm" action="'+ settings.storeUrl +'" method="post" enctype="multipart/form-data"><div class="col-md-6"><input id="fileInput" name="file_input" type="file" required=""><p class="help-block">Choose files.</p></div><div class="col-md-6"><input type="submit" class="btn btn-md btn-primary pull-right" value="Upload"></div></form></div><div id="progressBox" class="progress"><div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0;"></div></div></div></div></div>');
         
         this.append(html);
 

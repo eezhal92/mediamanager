@@ -32,7 +32,9 @@
 		base.$el = $(el);
 		base.el = el;
 		base.explorer = {
-			items: []
+			topPanel: {},
+			content: {},
+			pagination: {}
 		};
 		base.uploader = {};
 
@@ -44,19 +46,19 @@
 			modalHeader: '<div class="modal-header" id=""><h4 class="modal-title" id="">Media Manager</h4></div>',
 			modalFooter: '<div class="mexplorer-footer modal-footer"></div>',
 			tab: '<div role="tabpanel"><ul class="nav nav-tabs" role="tablist"><li role="presentation" class="active"><a href="#tabExplorer" aria-controls="tabExplorer" role="tab" data-toggle="tab">Explorer</a></li><li role="presentation"><a href="#tabUploader" aria-controls="tabUploader" role="tab" data-toggle="tab">Uploader</a></li></ul><div class="tab-content"><div role="tabpanel" class="tab-pane active" id="tabExplorer"></div><div role="tabpanel" class="tab-pane" id="tabUploader"></div></div></div>',
-			form: '<form class="mexplorer-form"></form>',
+			form: '<form></form>',
+			label: '<label></label>',
 			div: '<div></div>',
-            inputs: {
-            	text: '<input type="text" class="mexplorer-input-text form-control">',
-            	textarea:'<textarea class="mexplorer-input mexplorer-input-textarea form-control"></textarea>',
-            	select: '<select class="mexplorer-input mexplorer-input-select form-control"></select>',
-            	file: '<input type="file" class="mexplorer-input mexplorer-input-file">'
-            },
-            buttons: {
-            	buttonPrimary: '<button class="mexplorer-btn mexplorer-btn-primary btn btn-primary">',
-            	buttonDefault: '<button class="mexplorer-btn mexplorer-btn-default btn btn-default">',
-            	closeButton: '<button type="button" class="mexplorer-btn-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-            },
+      inputs: {
+      	text: '<input type="text" class="mexplorer-input-text form-control">',
+      	textarea:'<textarea class="mexplorer-input mexplorer-input-textarea form-control"></textarea>',
+      	select: '<select class="mexplorer-input mexplorer-input-select form-control"></select>',
+      	file: '<input type="file" class="mexplorer-input mexplorer-input-file">'
+      },
+      buttons: {
+      	common: '<button class="mexplorer-btn btn"></button>',
+      	closeButton: '<button type="button" class="mexplorer-btn-close close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+      },
 		};
 
 		base.$el.data('eezhal.mediaManager', base);
@@ -74,10 +76,40 @@
 			console.log('Initializing with options:', base.options);
 		}
 
+		base.generator = {};
+
+		base.generator.label = function(text) {
+			return $(base.components.label).text(text);
+		}
+
+		base.generator.div = function() {
+			return $(base.components.div);
+		}
+
+		base.generator.button = function(text) {
+			return $(base.components.buttons.common).text(text);
+		}
+
+		base.generator.select = function(attr) {
+			return $(base.components.inputs.select);
+		}
+
+		base.generator.option = function(items) {
+			var html = '';
+
+			if(items.length == 0) throw new Error("Please provide element");
+
+			items.forEach(function(item) {
+				html += '<option value="'+ item.value +'">'+ item.text +'</option>';
+			});
+
+			return html;
+		};
+
 		// generate html -
 		base.generateModalBase = function () {
 			var components = base.components;
-			var btn = $(components.buttons.buttonPrimary).text('Masukkan').attr('id', 'tabExplorerButton');
+			var btn = $(components.buttons.common).addClass('btn-primary').text('Masukkan').attr('id', 'tabExplorerButton');
 			base.$el.append(components.modalContent)
 				.find('.modal-content')
 				.prepend(components.modalHeader)
@@ -92,61 +124,114 @@
 			base.uploader.make();
 		};
 
-		// make html string
-		base.uploader.make = function () {
-			// var c = base.components;
-
-			// var html = $(c.div);
-			// var input = $(c.inputs.file).attr('name', 'file_media');
-
-			// var inputGroup = $(c.div).addClass('col-md-6').append(input);
-
-			// html.attr('class', 'row')
-			// 	.append(base.components.form)
-			// 	.attr('enctype', 'multipart/form-data')
-			// 	.append(inputGroup);
-			var html = $('<div class="row" style="padding: 20px 0 5px">\
-						  <form id="mediaUploadForm" action="'+ base.options.storeUrl +'" method="post" enctype="multipart/form-data">\
-						    <div class="col-md-9">\
-						      <input id="fileInput" name="file_input" type="file" required="">\
-						      <p class="help-block">Choose files.</p>\
-						    </div>\
-						    <div class="col-md-3">\
-						      <div id="progressBox" class="progress">\
-						        <div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0;"></div>\
-						      </div>\
-						    </div>\
-						  </form>\
-						</div>');
-
-
-				base.$el.find('#tabUploader').append(html);
-		}
-
 		base.explorer.make = function () {
 			base.explorer.clear();
 
-			var body = base.$el.find('.mexplorer-body');
-			base.explorer.generateLists().then(function(data) {
-				body.find('#tabExplorer').append(data);
+			var tabExplorer = base.$el.find('#tabExplorer');
+
+			// make div.row.container
+			var container = $('<div></div>').attr('class', 'row explorer-container').css('margin-top', '15px');
+
+			// make div.col-md-9.left
+			var left =  $('<div></div>').attr('class', 'col-md-9');
+			// make div.col-md-3.right
+			var right =  $('<div></div>').attr('class', 'col-md-3');
+
+			// isi panel ke div.left
+			// isi content ke div.left
+
+			var gen = base.generator;
+			// isi detail ke div.right
+
+			var topPanel = base.explorer.topPanel.make();
+
+			var content = gen.div().attr('class', 'explorer-content');
+
+			// base.explorer.generateLists().then(function(html) {
+			// 	content.append(html);
+			// });
+			base.explorer.getMediaItems(base.options.requestParams).then(function(response) {
+				content.append(base.explorer.generateLists(response.data));
+				$('.explorer-pagination').bootpag({
+						page: 1,
+						total: response.last_page,
+						maxVisible: 10,
+						per_page: 2
+				});
 			});
+
+			var pagination = gen.div().attr('class', 'explorer-pagination');
+			var clearfix = gen.div().attr('class', 'clearfix');
+
+			left.append(topPanel).append('<hr>').append(content).append(clearfix).append(pagination);
+			container.append(left).append(right);
+			tabExplorer.append(container);
+
+		};
+
+		base.explorer.content.update = function(items) {
+			base.$el.find('.explorer-content')
+				.empty()
+				.append(base.explorer.generateLists(items));
+		};
+
+		base.explorer.pagination.make = function() {
+
+		};
+
+		base.explorer.topPanel.make = function() {
+			var gen = base.generator;
+			var filterOptions = [
+				{ value: 'all', text: 'All'},
+				{ value: 'files', text: 'Files'},
+				{ value: 'images', text: 'Image'}
+			];
+
+			var sortOptions = [
+				{ value: 'date_asc', text: 'Date ASC'},
+				{ value: 'date_desc', text: 'Date DESC'},
+				{ value: 'name_asc', text: 'Name ASC'},
+				{ value: 'name_desc', text: 'Name DESC'}
+			];
+
+			var filterControl = gen.select().addClass('input-sm').attr('id', 'filterControl')
+														.append(base.generator.option(filterOptions));
+
+			var sortControl = gen.select().addClass('input-sm').attr('id', 'sortControl')
+													.append(base.generator.option(sortOptions));
+
+			var filterFormGroup = gen.div().attr('class', 'form-group')
+															.append(gen.label('Filter By:'))
+															.append(filterControl);
+			var sortFormGroup = gen.div().attr('class', 'form-group')
+														.append(gen.label('Sort By:'))
+														.append(sortControl);
+
+			var form = $(base.components.form).attr('class', 'form-inline')
+						.append(filterFormGroup)
+						.append(sortFormGroup)
+						.append(gen.button('Go').addClass('btn-default pull-right'));
+
+			return $('<div></div>').attr('class', 'explorer-top-panel').append(form);
 		};
 
 		base.explorer.generateLists = function(items) {
-			function generateHtml(response) {
-				var items = response.data;
+			// function generateHtml(response) {
+				// var items = response.data;
 				var html = "";
 				items.forEach(function(item, index) {
 					console.log(item);
 					html += base.explorer.generateItemTag(item);
 				});
 
-				html = $('<div class="row" style="padding-top: 15px;"></div>').append(html);
 				return html;
-			};
+			// };
 
-			return base.explorer.getMediaItems(base.options.requestParams)
-							.then(generateHtml);
+
+
+
+			// return base.explorer.getMediaItems(base.options.requestParams)
+			// 				.then(generateHtml);
 		};
 
 		base.explorer.generateItemTag = function(item) {
@@ -160,16 +245,20 @@
 												data-filename="'+ item.filename +'" data-mime-type="'+ item.mime_type +'" \
 												data-size ="'+ item.size +'">';
 
-			if(item.mime_type.split('/')[0] != 'image'){
-      	items += '<div class="thumb"><div class="filename">'+ item.filename +'</div></div>';
-      } else {
+			// if(item.mime_type.split('/')[0] != 'image'){
+      // 	items += '<div class="thumb"><div class="filename">'+ item.filename +'</div></div>';
+      // } else {
       	items += '<img width="220" class="img img-rounded img-responsive" src="'+ item.path +'">';
-      }
+      // }
 
 			items += '</a></div>';
 
 			return items;
 		};
+
+		base.explorer.generateImgTag = function (item) {
+			return '<img class="img img-responsive img-rounded" src="'+ item.url +'">';
+		}
 
 		base.explorer.getMediaItems = function (request_params) {
 			return $.get(base.indexUrl, request_params);
@@ -199,6 +288,36 @@
 			}
 		};
 
+		// make html string
+		base.uploader.make = function () {
+			var html = $('<div class="row" style="padding: 20px 0 5px">\
+						  <form id="mediaUploadForm" action="'+ base.options.storeUrl +'" method="post" enctype="multipart/form-data">\
+						    <div class="col-md-9">\
+						      <input id="fileInput" name="file_input" type="file" required="">\
+						      <p class="help-block">Choose files.</p>\
+						    </div>\
+						    <div class="col-md-3">\
+						      <div id="progressBox" class="progress">\
+						        <div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0;"></div>\
+						      </div>\
+						    </div>\
+						  </form>\
+						</div>');
+
+
+				base.$el.find('#tabUploader').append(html);
+		};
+
+		base.uploader.resetForm = function() {
+      return $('#mediaUploadForm').each(function() {
+        // guard against an input with the name of 'reset'
+        // note that IE reports the reset function as an 'object'
+        if (typeof this.reset == 'function' || (typeof this.reset == 'object' && !this.reset.nodeType)) {
+          this.reset();
+        }
+      });
+    };
+
 		base.setListeners = function () {
 			base.setModalListener();
 			base.setUploaderListener();
@@ -210,7 +329,6 @@
 				console.log('hit modal listener');
 
 				base.$invoker = $(e.relatedTarget);
-				// base.getMediaItems();
 
 				base.explorer.job = base.$invoker.data('job') || base.options.job;
 	      console.log('the job is ... ' + base.explorer.job);
@@ -254,8 +372,18 @@
 				console.log("#tabExplorerButton hit!", base.explorer.job);
 				if(base.explorer.job === "insert_content") {
 					if ( $.isFunction( base.options.callback.insertContent ) ) {
-							base.options.callback.insertContent.call( this,  'foo');
+							base.options.callback.insertContent.call( this,  'selected content to insert', base.explorer.generateImgTag(base.explorer.current_item));
 					}
+
+					$(base.el).modal('hide');
+				}
+
+				if(base.explorer.job === "set_value") {
+					if ( $.isFunction( base.options.callback.setValue ) ) {
+							base.options.callback.setValue.call( this,  'selected content to set', base.explorer.current_item);
+					}
+
+					$(base.el).modal('hide');
 				}
 
 			});
@@ -313,14 +441,17 @@
 						//jika success
 						bootalert(res.success);
             $('ul.nav-tabs a[href="#tabExplorer"]').tab('show');
-						base.explorer.make();
+						base.options.requestParams.page = 1;
 						base.uploader.resetForm();
+						base.explorer.make();
         }
 
 				function failCallback(xhr, error) { // error block
             var errors = $.parseJSON(xhr.responseText);
             console.log('error block', xhr);
-          	bootalert(error);
+						base.uploader.resetForm();
+						$('#progressBar').css('background-color', '#c9302c');
+						bootalert(error);
         }
 
         function bootalert(message) {
@@ -328,6 +459,7 @@
           	message: message,
             	callback: function() {
                  $('#progressBar').width('0%');
+								 $('#progressBar').css('background-color', 'none');								 
               }
           });
         }
@@ -336,19 +468,34 @@
 		}
 
 		base.setExplorerListener = function () {
+			$('.mexplorer-body').on('click', '.link', function() {
+					base.explorer.current_item = {
+							id: $(this).data('id'),
+							title: $(this).data('filename'),
+							size: $(this).data('size'),
+							mime_type: $(this).data('mime-type'),
+							url: $(this).data('url'),
+							date: $(this).data('date')
+					};
 
-		}
+					console.log('.link clicked! Current item: ', base.explorer.current_item);
 
-    base.uploader.resetForm = function() {
-      return $('#mediaUploadForm').each(function() {
-        // guard against an input with the name of 'reset'
-        // note that IE reports the reset function as an 'object'
-        if (typeof this.reset == 'function' || (typeof this.reset == 'object' && !this.reset.nodeType)) {
-          this.reset();
-        }
-      });
-    };
+					$('.explorer-content .media-item').not(this).removeClass('selected');
+					$(this).parent().toggleClass('selected');
+			});
 
+			$('.mexplorer-body').on('page', '.explorer-pagination', function(event, num){
+					base.options.requestParams.page = num;
+					// alert();
+
+					base.explorer.getMediaItems(base.options.requestParams)
+						.done(function(response) {
+							console.log('page ' + num + ':', response.data);
+							base.explorer.content.update(response.data);
+					});
+
+			});
+		};
 
 		// Execute Init function
 		base.init();
@@ -361,7 +508,7 @@
 		storeToken: {},
 		requestParams: {
       page: 1,
-      per_page: 8,
+      per_page: 2,
       filter: 'all',
       sort: 'date_desc'
     },

@@ -18,19 +18,19 @@ class MediaSeeder extends Seeder
           [
             'filename'=> 'foo.jpg',
             'path'=> 'img/medias/foo.jpg',
-            'mime_type'=> 'image/jpeg',
+            'mime_type'=> 'jpeg',
             'size'=> 20000,
           ],
           [
             'filename'=> 'bar.jpg',
             'path'=> 'img/medias/bar.jpg',
-            'mime_type'=> 'image/jpeg',
+            'mime_type'=> 'jpeg',
             'size'=> 26000,
           ],
           [
             'filename'=> 'lorem.jpg',
             'path'=> 'img/medias/lorem.jpg',
-            'mime_type'=> 'image/jpeg',
+            'mime_type'=> 'jpeg',
             'size'=> 27000,
           ],
           [

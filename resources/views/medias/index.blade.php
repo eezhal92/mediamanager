@@ -52,8 +52,9 @@
 			<hr>
 			<div class="set-container">
 				<form>
-				<input type="text" name="foo" class="form-control" placeholder="Please set my value...">
+				<input type="text" name="foo" class="form-control" placeholder="Please set my value..." value="">
 				</form>
+				<pre class="dump"></pre>
 			</div>
 		</div>
 		<div id=""output class="col-md-2">
@@ -88,11 +89,12 @@
 				value: $('meta[name="csrf-token"]').attr('content')
 			},
 			callback: {
-				insertContent: function(sesuatu) {
-					alert(sesuatu);
+				insertContent: function(sesuatu, img_tag) {
+					$('.insert-container').html(sesuatu).append(img_tag);
 				},
-				setValue: function() {
-
+				setValue: function(something, current_item) {
+					$('.set-container form input[type="text"][name="foo"]').val(something);
+					$('.set-container pre.dump').text(JSON.stringify(current_item));
 				}
 			}
 		});
